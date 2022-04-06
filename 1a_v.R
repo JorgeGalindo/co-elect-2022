@@ -129,15 +129,17 @@ write.csv(indecisos_dw,"indecisos_dw.csv")
 ###TABLA CON TODAS LAS ENCUESTAS
 
 tabla_dw <- raw_df %>%
+  left_join(ponderador_df) %>%
   mutate(X.1=fecha,
          X.2=encuestadora,
+         X.3=nota_lsv,
          Petro=gustavo_petro,
          Fico=federico_gutierrez,
          Fajardo=sergio_fajardo,
          Hernández=rodolfo_hernandez,
          Betancourt=ingrid_betancourt) %>%
-  select(X.1,X.2,Petro,Fico,Fajardo,Hernández,Betancourt) %>%
-  sort(fecha, decreasing = TRUE)
+  select(X.1,X.2,X.3,Petro,Fico,Fajardo,Hernández,Betancourt) %>%
+  arrange(X.1, decreasing = TRUE)
 
 write.csv(tabla_dw,"tabla_dw.csv")
 

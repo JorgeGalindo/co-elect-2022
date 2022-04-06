@@ -1,21 +1,12 @@
-"","encuestadora","fecha","muestra","candidato","vertical","nombres","horizontal"
-"1","CNC",2022-04-02,4206,"sergio_fajardo",8.4,"Sergio Fajardo",3.2660940900445
-"2","CNC",2022-04-02,4206,"ingrid_betancourt",1.5,"Ingrid Betancourt",5.34857383766212
-"3","CNC",2022-04-02,4206,"federico_gutierrez",24.5,"Federico Gutierrez",2.29917179676704
-"4","CNC",2022-04-02,4206,"rodolfo_hernandez",10,"Rodolfo Hernandez",4.24138976763934
-"5","CNC",2022-04-02,4206,"gustavo_petro",36.5,"Gustavo Petro",1.21899765469134
-"6","Guarumo",2022-04-03,1865,"sergio_fajardo",9.5,"Sergio Fajardo",3.2660940900445
-"7","Guarumo",2022-04-03,1865,"ingrid_betancourt",2.6,"Ingrid Betancourt",5.34857383766212
-"8","Guarumo",2022-04-03,1865,"federico_gutierrez",25,"Federico Gutierrez",2.29917179676704
-"9","Guarumo",2022-04-03,1865,"rodolfo_hernandez",9.3,"Rodolfo Hernandez",4.24138976763934
-"10","Guarumo",2022-04-03,1865,"gustavo_petro",34,"Gustavo Petro",1.21899765469134
-"11","MassiveCaller",2022-03-29,1000,"sergio_fajardo",12.3,"Sergio Fajardo",3.2660940900445
-"12","MassiveCaller",2022-03-29,1000,"ingrid_betancourt",2.6,"Ingrid Betancourt",5.34857383766212
-"13","MassiveCaller",2022-03-29,1000,"federico_gutierrez",27.6,"Federico Gutierrez",2.29917179676704
-"14","MassiveCaller",2022-03-29,1000,"rodolfo_hernandez",9.5,"Rodolfo Hernandez",4.24138976763934
-"15","MassiveCaller",2022-03-29,1000,"gustavo_petro",32.4,"Gustavo Petro",1.21899765469134
-"16","YanHass",2022-03-21,1236,"sergio_fajardo",10,"Sergio Fajardo",3.2660940900445
-"17","YanHass",2022-03-21,1236,"ingrid_betancourt",2,"Ingrid Betancourt",5.34857383766212
-"18","YanHass",2022-03-21,1236,"federico_gutierrez",19,"Federico Gutierrez",2.29917179676704
-"19","YanHass",2022-03-21,1236,"rodolfo_hernandez",11,"Rodolfo Hernandez",4.24138976763934
-"20","YanHass",2022-03-21,1236,"gustavo_petro",37,"Gustavo Petro",1.21899765469134
+"","X.1","X.2","X.3","Petro","Fico","Fajardo","Hernández","Betancourt"
+"1",2022-02-05,"CNC",9,27,4,6,14,7
+"2",2022-02-06,"YanHass",3.84,27,3,7,12,2
+"3",2022-02-08,"CELAG",2.86,28.1,2.2,7.2,4.1,NA
+"4",2022-03-06,"Guarumo",4.3,32.7,7.7,9.1,8.2,3.3
+"5",2022-03-12,"AtlasIntel",5,35.2,11.4,11.3,11.2,1.5
+"6",2022-03-20,"CNC",9,32,23,10,10,3
+"7",2022-03-21,"YanHass",3.84,37,19,10,11,2
+"8",2022-03-21,"MassiveCaller",1.45,33.5,22.1,10.1,8.9,2.4
+"9",2022-03-29,"MassiveCaller",1.45,32.4,27.6,12.3,9.5,2.6
+"10",2022-04-02,"CNC",9,36.5,24.5,8.4,10,1.5
+"11",2022-04-03,"Guarumo",4.3,34,25,9.5,9.3,2.6
