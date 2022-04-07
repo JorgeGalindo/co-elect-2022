@@ -8,29 +8,25 @@ raw_df <- read_csv("https://raw.githubusercontent.com/nelsonamayad/Elecciones-pr
 ponderador_df <- read_csv("ponderador_lsv.csv") %>%
   mutate(ponderador=nota_lsv*0.02+0.8) #hace que cada valor tenga un peso equivalente a 1 si es perfecto o se le reste hasta un 20% de peso
 
-###LIMPIEZA Y NORMALIZACION
+###LIMPIEZA
 
-norm_df <- raw_df %>%
+clean_df <- raw_df %>%
   #selección de variables relevantes
   select(encuestadora,muestra,fecha,ns_nr,otros,blanco,sergio_fajardo,ingrid_betancourt,federico_gutierrez,rodolfo_hernandez,gustavo_petro) %>%
-  #preparando para normalizar
+  #añadiendo indefinición como categoría
   replace_na(list(ns_nr = 0, otros = 0, blanco=0 )) %>%
   mutate(indef=ns_nr+otros+blanco, #suma de todo votante probable sin candidato
          asumindef=5.58, #asunción de nulo+blancos = la media del % de la suma de ambos en 2014 y 2018; 1a vuelta
-         votodefin=100-indef-asumindef, #todos los votantes definidos
+         votodefin=100-indef+asumindef, #todos los votantes definidos
          ) %>%
   select(-otros,-blanco,-ns_nr) %>%
-  #pivoteando
   pivot_longer(cols = contains("_"),
                names_to = "candidato", values_to = "int_voto_raw") %>%
-  replace_na(list( int_voto_raw=0)) %>%
-  #normalizando
-  mutate(int_voto_norm = int_voto_raw/votodefin*100,
-         fecha=as.Date(fecha, format="%Y-%m-%d"))
+  replace_na(list( int_voto_raw=0))
 
 ###PROMEDIO CRUDO CON ÚLTIMAS ENCUESTAS DE CADA CASA
 
-promedio_raw_df <- norm_df %>%
+promedio_raw_df <- clean_df %>%
   #escogiendo las que son
   filter(fecha>"2022-03-12") %>% #campo post-consultas
   select(encuestadora,candidato,int_voto_raw,fecha) %>%
@@ -47,7 +43,7 @@ promedio_raw_df <- norm_df %>%
 
 ###TABLA ENCUESTAS
 
-promedio_dw <- norm_df %>%
+promedio_dw <- clean_df %>%
   #escogiendo las que son
   filter(fecha>"2022-03-12") %>% #campo post-consultas
   select(encuestadora,candidato,int_voto_raw,fecha,muestra) %>%
@@ -78,7 +74,7 @@ write.csv(promedio_dw,"promedio_dw.csv")
 
 ###PROMEDIO CRUDO PRE.CONSULTAS
 
-promedio_raw_pre_df <- norm_df %>%
+promedio_raw_pre_df <- clean_df %>%
   #escogiendo las que son
   filter(fecha<"2022-03-12") %>% #campo post-consultas
   select(encuestadora,candidato,int_voto_raw,fecha) %>%
@@ -143,41 +139,6 @@ tabla_dw <- raw_df %>%
 
 write.csv(tabla_dw,"tabla_dw.csv")
 
-#----------- DESDE AQUÍ ES EXPERIMENTO DE NORMALIZACIÓN, AKA COCINA
 
-###PROMEDIO NORMALIZADO CON ÚLTIMAS ENCUESTAS DE CADA CASA
-
-promedio_norm_df <- norm_df %>%
-  #escogiendo las que son
-  filter(fecha>"2022-03-12") %>% #campo post-consultas
-  select(encuestadora,candidato,int_voto_norm,fecha) %>%
-  pivot_wider(names_from="candidato", values_from="int_voto_norm") %>%
-  group_by(encuestadora) %>%
-  slice_tail() %>%
-  ungroup() %>%
-  #introduciendo valor ponderado
-  pivot_longer(cols = contains("_"),
-               names_to = "candidato", values_to = "int_voto_norm") %>%
-  left_join(ponderador_df) %>%
-  group_by(candidato) %>%
-  summarize(promedio=weighted.mean(int_voto_norm,ponderador)) 
-
-
-###PROMEDIO NORMALIZADO PRE.CONSULTAS
-
-promedio_norm_pre_df <- norm_df %>%
-  #escogiendo las que son
-  filter(fecha<"2022-03-12") %>% #campo post-consultas
-  select(encuestadora,candidato,int_voto_norm,fecha) %>%
-  pivot_wider(names_from="candidato", values_from="int_voto_norm") %>%
-  group_by(encuestadora) %>%
-  slice_tail() %>%
-  ungroup() %>%
-  #introduciendo valor ponderado
-  pivot_longer(cols = contains("_"),
-               names_to = "candidato", values_to = "int_voto_norm") %>%
-  left_join(ponderador_df) %>%
-  group_by(candidato) %>%
-  summarize(promedio=weighted.mean(int_voto_norm,ponderador)) 
 
 
