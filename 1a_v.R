@@ -1,8 +1,11 @@
 library(tidyverse)
 
-#Primero, cogemos la recopilación de encuestas de recetas-electorales.com
-raw_df <- read_csv("https://raw.githubusercontent.com/nelsonamayad/Elecciones-presidenciales-2022/main/Encuestas%202022/encuestas_2022.csv")
+#Primero, cogemos la recopilación de encuestas de recetas-electorales.com- añadimos TYSE
 
+tyse_raw <- read_csv("tyse.csv")
+raw_df <- read_csv("https://raw.githubusercontent.com/nelsonamayad/Elecciones-presidenciales-2022/main/Encuestas%202022/encuestas_2022.csv") %>% 
+  rbind(tyse_raw)
+  
 #También cargamos la evaluación de lasillavacia.com para la ponderación
 
 ponderador_df <- read_csv("ponderador_lsv.csv") %>%
@@ -114,6 +117,108 @@ write.csv(tabla_dw,"tabla_dw.csv")
 
 
 ###EVOLUCIÓN DEL PROMEDIO - el loop no funcionaba bien así que he tenido que hacer copy paste pero no es óptimo, espero mejorar el codigo
+
+
+promedio_20 <- clean_df %>%
+  #escogiendo las que son
+  filter(fecha<"2022-05-17" & fecha>"2022-03-12") %>% #campo post-consultas
+  select(encuestadora,candidato,int_voto_raw,fecha)  %>%
+  pivot_wider(names_from="candidato", values_from="int_voto_raw") %>%
+  group_by(encuestadora) %>%
+  slice_tail() %>%
+  ungroup() %>%
+  #introduciendo valor ponderado
+  pivot_longer(cols = contains("_"),
+               names_to = "candidato", values_to = "int_voto_raw") %>%
+  left_join(ponderador_df) %>%
+  group_by(candidato) %>%
+  summarize(promedio=weighted.mean(int_voto_raw,ponderador)) %>%
+  mutate(fecha="2022-05-16")
+
+
+promedio_19 <- clean_df %>%
+  #escogiendo las que son
+  filter(fecha<"2022-05-16" & fecha>"2022-03-12") %>% #campo post-consultas
+  select(encuestadora,candidato,int_voto_raw,fecha)  %>%
+  pivot_wider(names_from="candidato", values_from="int_voto_raw") %>%
+  group_by(encuestadora) %>%
+  slice_tail() %>%
+  ungroup() %>%
+  #introduciendo valor ponderado
+  pivot_longer(cols = contains("_"),
+               names_to = "candidato", values_to = "int_voto_raw") %>%
+  left_join(ponderador_df) %>%
+  group_by(candidato) %>%
+  summarize(promedio=weighted.mean(int_voto_raw,ponderador)) %>%
+  mutate(fecha="2022-05-15")
+
+
+
+promedio_18 <- clean_df %>%
+  #escogiendo las que son
+  filter(fecha<"2022-05-13" & fecha>"2022-03-12") %>% #campo post-consultas
+  select(encuestadora,candidato,int_voto_raw,fecha)  %>%
+  pivot_wider(names_from="candidato", values_from="int_voto_raw") %>%
+  group_by(encuestadora) %>%
+  slice_tail() %>%
+  ungroup() %>%
+  #introduciendo valor ponderado
+  pivot_longer(cols = contains("_"),
+               names_to = "candidato", values_to = "int_voto_raw") %>%
+  left_join(ponderador_df) %>%
+  group_by(candidato) %>%
+  summarize(promedio=weighted.mean(int_voto_raw,ponderador)) %>%
+  mutate(fecha="2022-05-12")
+
+
+promedio_17 <- clean_df %>%
+  #escogiendo las que son
+  filter(fecha<"2022-05-11" & fecha>"2022-03-12") %>% #campo post-consultas
+  select(encuestadora,candidato,int_voto_raw,fecha)  %>%
+  pivot_wider(names_from="candidato", values_from="int_voto_raw") %>%
+  group_by(encuestadora) %>%
+  slice_tail() %>%
+  ungroup() %>%
+  #introduciendo valor ponderado
+  pivot_longer(cols = contains("_"),
+               names_to = "candidato", values_to = "int_voto_raw") %>%
+  left_join(ponderador_df) %>%
+  group_by(candidato) %>%
+  summarize(promedio=weighted.mean(int_voto_raw,ponderador)) %>%
+  mutate(fecha="2022-05-10")
+
+
+promedio_16 <- clean_df %>%
+  #escogiendo las que son
+  filter(fecha<"2022-05-05" & fecha>"2022-03-12") %>% #campo post-consultas
+  select(encuestadora,candidato,int_voto_raw,fecha)  %>%
+  pivot_wider(names_from="candidato", values_from="int_voto_raw") %>%
+  group_by(encuestadora) %>%
+  slice_tail() %>%
+  ungroup() %>%
+  #introduciendo valor ponderado
+  pivot_longer(cols = contains("_"),
+               names_to = "candidato", values_to = "int_voto_raw") %>%
+  left_join(ponderador_df) %>%
+  group_by(candidato) %>%
+  summarize(promedio=weighted.mean(int_voto_raw,ponderador)) %>%
+  mutate(fecha="2022-05-04")
+
+promedio_15 <- clean_df %>%
+  #escogiendo las que son
+  filter(fecha<"2022-05-02" & fecha>"2022-03-12") %>% #campo post-consultas
+  select(encuestadora,candidato,int_voto_raw,fecha)  %>%
+  pivot_wider(names_from="candidato", values_from="int_voto_raw") %>%
+  group_by(encuestadora) %>%
+  slice_tail() %>%
+  ungroup() %>%
+  #introduciendo valor ponderado
+  pivot_longer(cols = contains("_"),
+               names_to = "candidato", values_to = "int_voto_raw") %>%
+  left_join(ponderador_df) %>%
+  group_by(candidato) %>%
+  summarize(promedio=weighted.mean(int_voto_raw,ponderador)) %>%
+  mutate(fecha="2022-05-01")
 
 promedio_1 <- clean_df %>%
   #escogiendo las que son
@@ -340,7 +445,7 @@ promedio_12 <- promedio_raw_pre_df %>%
 
   
 promedio_evol_df <- promedio_raw_df %>%
-  mutate(fecha="2022-05-01") %>%
+  mutate(fecha="2022-05-17") %>%
   rbind(promedio_1) %>%
   rbind(promedio_2) %>%
   rbind(promedio_3) %>%
@@ -355,6 +460,12 @@ promedio_evol_df <- promedio_raw_df %>%
   rbind(promedio_12) %>%
   rbind(promedio_13) %>%
   rbind(promedio_14) %>%
+  rbind(promedio_15) %>%
+  rbind(promedio_16) %>%
+  rbind(promedio_17) %>%
+  rbind(promedio_18) %>%
+  rbind(promedio_19) %>%
+  rbind(promedio_20) %>%
 
   pivot_wider(names_from = candidato, values_from = promedio) 
 
