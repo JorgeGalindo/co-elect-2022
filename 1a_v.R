@@ -2,9 +2,7 @@ library(tidyverse)
 
 #Primero, cogemos la recopilación de encuestas de recetas-electorales.com- añadimos TYSE
 
-tyse_raw <- read_csv("tyse.csv")
-raw_df <- read_csv("https://raw.githubusercontent.com/nelsonamayad/Elecciones-presidenciales-2022/main/Encuestas%202022/encuestas_2022.csv") %>% 
-  rbind(tyse_raw)
+raw_df <- read_csv("https://raw.githubusercontent.com/nelsonamayad/Elecciones-presidenciales-2022/main/Encuestas%202022/encuestas_2022.csv")
   
 #También cargamos la evaluación de lasillavacia.com para la ponderación
 
