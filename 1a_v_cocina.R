@@ -1,8 +1,40 @@
 library(tidyverse)
 
 #Primero, cogemos la recopilación de encuestas de recetas-electorales.com
-raw_df <- read_csv("https://raw.githubusercontent.com/nelsonamayad/Elecciones-presidenciales-2022/main/Encuestas%202022/encuestas_2022.csv")
-
+raw_df <- read_csv("https://raw.githubusercontent.com/nelsonamayad/Elecciones-presidenciales-2022/main/Encuestas%202022/encuestas_2022.csv") %>%
+  mutate(
+    #Error de fecha en el dato original
+    fecha=case_when(
+      encuestadora=="Invamer" & fecha=="2022-04-19" ~ as.Date("2022-05-19"),
+      TRUE ~ fecha
+    ),
+    #Normalización de Invamer para que la estimación de voto incluya a indecisos dentro de la base
+    sergio_fajardo=case_when(
+    encuestadora=="Invamer" & fecha=="2022-04-29" ~ sergio_fajardo/104.8*100,
+    encuestadora=="Invamer" & fecha=="2022-05-19" ~ sergio_fajardo/106.2*100,
+    TRUE ~ sergio_fajardo
+    ),
+    federico_gutierrez=case_when(
+      encuestadora=="Invamer" & fecha=="2022-04-29" ~ federico_gutierrez/104.8*100,
+      encuestadora=="Invamer" & fecha=="2022-05-19" ~ federico_gutierrez/106.2*100,
+      TRUE ~ federico_gutierrez
+    ),
+    gustavo_petro=case_when(
+      encuestadora=="Invamer" & fecha=="2022-04-29" ~ gustavo_petro/104.8*100,
+      encuestadora=="Invamer" & fecha=="2022-05-19" ~ gustavo_petro/106.2*100,
+      TRUE ~ gustavo_petro
+    ),
+    ingrid_betancourt=case_when(
+      encuestadora=="Invamer" & fecha=="2022-04-29" ~ ingrid_betancourt/104.8*100,
+      encuestadora=="Invamer" & fecha=="2022-05-19" ~ ingrid_betancourt/106.2*100,
+      TRUE ~ ingrid_betancourt
+    ),
+    rodolfo_hernandez=case_when(
+      encuestadora=="Invamer" & fecha=="2022-04-29" ~ rodolfo_hernandez/104.8*100,
+      encuestadora=="Invamer" & fecha=="2022-05-19" ~ rodolfo_hernandez/106.2*100,
+      TRUE ~ rodolfo_hernandez
+    )
+         )
 #También cargamos la evaluación de lasillavacia.com para la ponderación
 
 ponderador_df <- read_csv("ponderador_lsv.csv") %>%
@@ -48,6 +80,7 @@ promedio_norm_df <- norm_df %>%
   group_by(candidato) %>%
   summarize(promedio=weighted.mean(int_voto_norm,ponderador)) 
 
+write_csv(promedio_norm_df,"modelo/promedio_norm.csv")
 
 ###PROMEDIO NORMALIZADO PRE.CONSULTAS
 

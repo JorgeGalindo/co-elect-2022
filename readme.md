@@ -9,7 +9,7 @@ El resultado se puede ver [aquí](https://elpais.com/internacional/2022-04-06/pe
 
 ### Pre-requisitos 📋
 
-Tidyverse. Poco más, por ahora.
+Tidyverse para lo básico, RStan para el modelo experimental.
 
 
 ### Componentes ⚙️
@@ -41,6 +41,10 @@ Después se obtiene el promedio ponderado como en el proceso básico.
 El **promedio con indecisos distribuidos** es similar al normalizado porque parte de la suposición de que los indecisos acabarán en algún sitio y un 5,6% de ellos lo harán en el blanco y nulo. Pero en lugar de sacarlos de la ecuación por completo, se distribuyen de manera perfectamente proporcional entre el resto de candidatos en función del tamaño de su votación según cada encuesta. Siguiendo con el mismo ejemplo del candidato X, llegaríamos a él mediante la fórmula
 
 50+(15x0,5)=57,5%
+
+## Modelo experimental
+
+A partir del trabajo de recetas-electrales.com para definir un modelo de pronóstico electoral bayesiano con RStan (https://www.recetas-electorales.com/ajiaco.html), construyo un modelo idéntico pero alimentado con mi promedio normalizado. Está en la carpeta /modelo.
 
 
 ## Autores ✒️
