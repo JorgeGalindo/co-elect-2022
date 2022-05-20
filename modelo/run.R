@@ -50,3 +50,6 @@ modelo_fit <- stan(file = "modelo/model.stan",
                    chains=4,
                    cores=4,
                    seed=332211)
+
+shinystan::launch_shinystan(modelo_fit)
+

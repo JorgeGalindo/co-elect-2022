@@ -1,41 +1,60 @@
 library(tidyverse)
 
-#Primero, cogemos la recopilación de encuestas de recetas-electorales.com- añadimos TYSE
+#Primero, cogemos la recopilación de encuestas de recetas-electorales.com
 
 raw_df <- read_csv("https://raw.githubusercontent.com/nelsonamayad/Elecciones-presidenciales-2022/main/Encuestas%202022/encuestas_2022.csv") %>%
+  replace_na(list(ns_nr=0)) %>%
   mutate(
     #Error de fecha en el dato original
     fecha=case_when(
       encuestadora=="Invamer" & fecha=="2022-04-19" ~ as.Date("2022-05-19"),
       TRUE ~ fecha
     ),
-    #Normalización de Invamer para que la estimación de voto incluya a indecisos dentro de la base
+    #Saco a los indecisos de la base
     sergio_fajardo=case_when(
-      encuestadora=="Invamer" & fecha=="2022-04-29" ~ sergio_fajardo/104.8*100,
-      encuestadora=="Invamer" & fecha=="2022-05-19" ~ sergio_fajardo/106.2*100,
+      ns_nr>0  ~ sergio_fajardo/(100-ns_nr)*100,
       TRUE ~ sergio_fajardo
     ),
     federico_gutierrez=case_when(
-      encuestadora=="Invamer" & fecha=="2022-04-29" ~ federico_gutierrez/104.8*100,
-      encuestadora=="Invamer" & fecha=="2022-05-19" ~ federico_gutierrez/106.2*100,
+      ns_nr>0  ~ federico_gutierrez/(100-ns_nr)*100,
       TRUE ~ federico_gutierrez
     ),
     gustavo_petro=case_when(
-      encuestadora=="Invamer" & fecha=="2022-04-29" ~ gustavo_petro/104.8*100,
-      encuestadora=="Invamer" & fecha=="2022-05-19" ~ gustavo_petro/106.2*100,
+      ns_nr>0  ~ gustavo_petro/(100-ns_nr)*100,
+      
       TRUE ~ gustavo_petro
     ),
     ingrid_betancourt=case_when(
-      encuestadora=="Invamer" & fecha=="2022-04-29" ~ ingrid_betancourt/104.8*100,
-      encuestadora=="Invamer" & fecha=="2022-05-19" ~ ingrid_betancourt/106.2*100,
+      ns_nr>0  ~ ingrid_betancourt/(100-ns_nr)*100,
+      
       TRUE ~ ingrid_betancourt
     ),
     rodolfo_hernandez=case_when(
-      encuestadora=="Invamer" & fecha=="2022-04-29" ~ rodolfo_hernandez/104.8*100,
-      encuestadora=="Invamer" & fecha=="2022-05-19" ~ rodolfo_hernandez/106.2*100,
+      ns_nr>0  ~ rodolfo_hernandez/(100-ns_nr)*100,
+      
       TRUE ~ rodolfo_hernandez
     )
   )
+
+
+#También cargamos la evaluación de lasillavacia.com para la ponderación
+
+ponderador_df <- read_csv("ponderador_lsv.csv") %>%
+  mutate(ponderador=nota_lsv*0.02+0.8) #hace que cada valor tenga un peso equivalente a 1 si es perfecto o se le reste hasta un 20% de peso
+
+###LIMPIEZA & NORMALIZACIÓN
+
+clean_df <- raw_df %>%
+  #selección de variables relevantes
+  select(encuestadora,muestra,fecha,ns_nr,otros,blanco,sergio_fajardo,ingrid_betancourt,federico_gutierrez,rodolfo_hernandez,gustavo_petro) %>%
+  #añadiendo indefinición como categoría
+  replace_na(list(ns_nr = 0, otros = 0, blanco=0 )) %>%
+  select(-otros,-blanco,-ns_nr) %>%
+  #pivoteando
+  pivot_longer(cols = contains("_"),
+               names_to = "candidato", values_to = "int_voto_raw") %>%
+  replace_na(list( int_voto_raw=0))
+
 
 ###PROMEDIO CRUDO CON ÚLTIMAS ENCUESTAS DE CADA CASA
 
@@ -53,6 +72,8 @@ promedio_raw_df <- clean_df %>%
   left_join(ponderador_df) %>%
   group_by(candidato) %>%
   summarize(promedio=weighted.mean(int_voto_raw,ponderador))
+
+write.csv(promedio_raw_df,"modelo/promedio_norm.csv")
 
 ###TABLA ENCUESTAS
 
@@ -125,9 +146,9 @@ write.csv(tabla_dw,"tabla_dw.csv")
 ###EVOLUCIÓN DEL PROMEDIO - el loop no funcionaba bien así que he tenido que hacer copy paste pero no es óptimo, espero mejorar el codigo
 
 
-promedio_20 <- clean_df %>%
+promedio_23 <- clean_df %>%
   #escogiendo las que son
-  filter(fecha<"2022-05-17" & fecha>"2022-03-12") %>% #campo post-consultas
+  filter(fecha<"2022-05-21" & fecha>"2022-03-12") %>% #campo post-consultas
   select(encuestadora,candidato,int_voto_raw,fecha)  %>%
   pivot_wider(names_from="candidato", values_from="int_voto_raw") %>%
   group_by(encuestadora) %>%
@@ -139,7 +160,59 @@ promedio_20 <- clean_df %>%
   left_join(ponderador_df) %>%
   group_by(candidato) %>%
   summarize(promedio=weighted.mean(int_voto_raw,ponderador)) %>%
-  mutate(fecha="2022-05-16")
+  mutate(fecha="2022-05-20")
+
+
+promedio_22 <- clean_df %>%
+  #escogiendo las que son
+  filter(fecha<"2022-05-20" & fecha>"2022-03-12") %>% #campo post-consultas
+  select(encuestadora,candidato,int_voto_raw,fecha)  %>%
+  pivot_wider(names_from="candidato", values_from="int_voto_raw") %>%
+  group_by(encuestadora) %>%
+  slice_tail() %>%
+  ungroup() %>%
+  #introduciendo valor ponderado
+  pivot_longer(cols = contains("_"),
+               names_to = "candidato", values_to = "int_voto_raw") %>%
+  left_join(ponderador_df) %>%
+  group_by(candidato) %>%
+  summarize(promedio=weighted.mean(int_voto_raw,ponderador)) %>%
+  mutate(fecha="2022-05-19")
+
+
+
+promedio_21 <- clean_df %>%
+  #escogiendo las que son
+  filter(fecha<"2022-05-19" & fecha>"2022-03-12") %>% #campo post-consultas
+  select(encuestadora,candidato,int_voto_raw,fecha)  %>%
+  pivot_wider(names_from="candidato", values_from="int_voto_raw") %>%
+  group_by(encuestadora) %>%
+  slice_tail() %>%
+  ungroup() %>%
+  #introduciendo valor ponderado
+  pivot_longer(cols = contains("_"),
+               names_to = "candidato", values_to = "int_voto_raw") %>%
+  left_join(ponderador_df) %>%
+  group_by(candidato) %>%
+  summarize(promedio=weighted.mean(int_voto_raw,ponderador)) %>%
+  mutate(fecha="2022-05-18")
+
+
+promedio_20 <- clean_df %>%
+  #escogiendo las que son
+  filter(fecha<"2022-05-18" & fecha>"2022-03-12") %>% #campo post-consultas
+  select(encuestadora,candidato,int_voto_raw,fecha)  %>%
+  pivot_wider(names_from="candidato", values_from="int_voto_raw") %>%
+  group_by(encuestadora) %>%
+  slice_tail() %>%
+  ungroup() %>%
+  #introduciendo valor ponderado
+  pivot_longer(cols = contains("_"),
+               names_to = "candidato", values_to = "int_voto_raw") %>%
+  left_join(ponderador_df) %>%
+  group_by(candidato) %>%
+  summarize(promedio=weighted.mean(int_voto_raw,ponderador)) %>%
+  mutate(fecha="2022-05-17")
 
 
 promedio_19 <- clean_df %>%
@@ -451,7 +524,7 @@ promedio_12 <- promedio_raw_pre_df %>%
 
   
 promedio_evol_df <- promedio_raw_df %>%
-  mutate(fecha="2022-05-17") %>%
+  mutate(fecha="2022-05-21") %>%
   rbind(promedio_1) %>%
   rbind(promedio_2) %>%
   rbind(promedio_3) %>%
@@ -472,7 +545,9 @@ promedio_evol_df <- promedio_raw_df %>%
   rbind(promedio_18) %>%
   rbind(promedio_19) %>%
   rbind(promedio_20) %>%
-
+  rbind(promedio_21) %>%
+  rbind(promedio_22) %>%
+  rbind(promedio_23) %>%
   pivot_wider(names_from = candidato, values_from = promedio) 
 
 promedio_evol <- tabla_dw %>%
@@ -483,7 +558,14 @@ write_csv(promedio_evol,"promedio_evol.csv")
 
 #--------gráficos adicionales
 
+###GRÁFICO DIFERENCIAS FICO-RODOLFO
 
+fico_rodolfo_dw <- promedio_dw %>%
+  filter(cand=="Federico Gutiérrez" | cand=="Rodolfo Hernández" ) %>%
+  select(Encuestadora,cand,vertical) %>%
+  pivot_wider(names_from = cand, values_from = vertical)
+
+write_csv(fico_rodolfo_dw,"fico_rodolfo_dw.csv")
 
 ###GRÁFICO PRE-POST
 
@@ -515,4 +597,7 @@ indecisos_dw <- promedio_raw_df %>%
   select(Decidido,Indeciso)
 
 write.csv(indecisos_dw,"indecisos_dw.csv")
+
+
+
 
