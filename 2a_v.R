@@ -85,7 +85,7 @@ promedio_dw <- clean_df %>%
   arrange(-(promedio)) %>%
     mutate(
       secuencia=1:n(),
-      horizontal=runif(5,min=secuencia, max=secuencia+.7)) %>%
+      horizontal=runif(2,min=secuencia, max=secuencia+.7)) %>%
   ungroup() %>%
   select(-muestra,-candidato,-encuestadora,-secuencia,-promedio)
   
